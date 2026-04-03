@@ -396,16 +396,16 @@ else:  # Dashboard page
         
         filtered_patients = [p for p in st.session_state['patients'] 
                             if search_term.lower() in p['name'].lower() or search_term.lower() in p['id'].lower()]
-        
-        for p in filtered_patients:
-            if st.button(p['name'], key=f"patient_{p['id']}", use_container_width=True):
-                st.session_state['selected_patient'] = p['id']
-        
-        if search_term and not filtered_patients:
-            st.info('No patients match your search.')
-        
-        st.markdown('---')
-        if st.button('🗑️ Remove selected patient', use_container_width=True):
+
+            if filtered_patients:
+                patient_ids = [p['id'] for p in filtered_patients]
+                patient_names = {p['id']: p['name'] for p in filtered_patients}
+                current_index = patient_ids.index(st.session_state['selected_patient']) if st.session_state['selected_patient'] in patient_ids else 0
+
+                chosen_id = st.selectbox('Choose patient', patient_ids, index=current_index,
+                                         format_func=lambda x: patient_names.get(x, x))
+                st.session_state['selected_patient'] = chosen_id
+            else:
             if st.session_state['selected_patient'] is not None:
                 before = len(st.session_state['patients'])
                 st.session_state['patients'] = [p for p in st.session_state['patients'] if p['id'] != st.session_state['selected_patient']]
