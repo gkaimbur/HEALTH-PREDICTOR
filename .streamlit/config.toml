@@ -1,0 +1,24 @@
+[client]
+showErrorDetails = false
+showWarningOnDirectExecution = false
+
+[logger]
+level = "info"
+
+[server]
+port = 8501
+headless = true
+runOnSave = true
+enableXsrfProtection = false
+maxUploadSize = 200
+enableCORS = false
+
+[theme]
+primaryColor = "#FF6B6B"
+backgroundColor = "#F3F4F6"
+secondaryBackgroundColor = "#FFFFFF"
+textColor = "#1F2937"
+font = "sans serif"
+
+[browser]
+gatherUsageStats = false
