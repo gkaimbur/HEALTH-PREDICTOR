@@ -34,28 +34,34 @@ if firebase_admin and firestore:
     if not firebase_admin._apps:
         cred_source = None
         
-        # Priority 1: Check Streamlit Cloud secrets (TOML format)
-        try:
-            if 'firebase' in st.secrets:
-                firebase_dict = dict(st.secrets['firebase'])
-                firebase_json = json.dumps(firebase_dict)
-                firebase_service_account_path.write_text(firebase_json)
-                cred_source = str(firebase_service_account_path)
-        except Exception as e:
-            firebase_error_message = f"Error loading from Streamlit secrets: {str(e)}"
-        
-        # Priority 2: Check local file
-        if not cred_source and firebase_service_account_path.exists():
+        # Priority 1: Check local file FIRST (user's actual file)
+        if firebase_service_account_path.exists():
             cred_source = str(firebase_service_account_path)
         
-        # Priority 3: Check base64-encoded environment variable (Render/Railway)
+        # Priority 2: Check Streamlit Cloud secrets (TOML format) - DON'T write to file
+        if not cred_source:
+            try:
+                if 'firebase' in st.secrets and st.secrets['firebase']:
+                    firebase_dict = dict(st.secrets['firebase'])
+                    firebase_json = json.dumps(firebase_dict)
+                    # Only write if it has valid content (not empty/placeholder)
+                    if firebase_dict.get('project_id') and not firebase_dict.get('project_id').startswith('YOUR_'):
+                        firebase_service_account_path.write_text(firebase_json)
+                        cred_source = str(firebase_service_account_path)
+            except Exception as e:
+                firebase_error_message = f"Error loading from Streamlit secrets: {str(e)}"
+        
+        # Priority 3: Check base64-encoded environment variable (Render/Railway) - DON'T write unless valid
         if not cred_source:
             firebase_cred_base64 = os.getenv('FIREBASE_SERVICE_ACCOUNT_BASE64')
             if firebase_cred_base64:
                 try:
                     firebase_cred_json = base64.b64decode(firebase_cred_base64).decode('utf-8')
-                    firebase_service_account_path.write_text(firebase_cred_json)
-                    cred_source = str(firebase_service_account_path)
+                    # Only write if valid JSON with content
+                    firebase_dict = json.loads(firebase_cred_json)
+                    if firebase_dict.get('project_id') and not firebase_dict.get('project_id').startswith('YOUR_'):
+                        firebase_service_account_path.write_text(firebase_cred_json)
+                        cred_source = str(firebase_service_account_path)
                 except Exception as e:
                     firebase_error_message = f"Error decoding Firebase credentials from environment: {str(e)}"
         
