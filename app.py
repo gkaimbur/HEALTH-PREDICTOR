@@ -802,8 +802,8 @@ else:  # Dashboard page
                             save_patient_to_firestore(new_patient)
                             st.session_state['last_saved_visit'] = datetime.now()
                             st.session_state['unsaved_changes'] = False
-                            st.success(f'✅ Patient {enroll_name} saved to Firebase successfully!')
-                            st.info('⏳ Refreshing data in 2 seconds...')
+                            st.success(f'✅ {enroll_name} has been successfully added! You can find this new patient in the patients table.')
+                            # Refresh data in background (without countdown message that doesn't work)
                             import time
                             time.sleep(2)
                             st.session_state['patients'] = load_patients_from_firestore()
