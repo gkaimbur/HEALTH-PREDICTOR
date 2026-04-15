@@ -5,7 +5,6 @@ showErrorDetails = false
 level = "info"
 
 [server]
-port = 8501
 headless = true
 runOnSave = true
 enableXsrfProtection = false
