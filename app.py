@@ -21,7 +21,7 @@ except ModuleNotFoundError:
 
 from pathlib import Path
 
-st.set_page_config(page_title='HDP Longitudinal Predictor', layout='wide')
+st.set_page_config(page_title='HDP PREDICTOR', layout='wide')
 
 # Firebase service setup
 firebase_service_account_path = Path('firebase-service-account.json')
@@ -400,7 +400,8 @@ else:  # Dashboard page
             st.error('⚠️ Firebase is not initialized. Patient data will not be persisted across sessions.')
 
     if not st.session_state['logged_in']:
-        st.title('Pregnancy Hypertensive Disorder (HDP) Longitudinal Risk Explorer')
+        st.title('🏥 HDP PREDICTOR')
+        st.markdown('### Hypertensive Disorder of Pregnancy Risk Assessment')
         with st.form('login_form'):
             st.write('### User Login')
             username = st.text_input('Username', value='doctor')
@@ -416,7 +417,7 @@ else:  # Dashboard page
         st.stop()
 
     st.markdown("<br><br>", unsafe_allow_html=True)  # Move title down
-    st.title('Longitudinal Risk Explorer')
+    st.title('🏥 HDP PREDICTOR')
 
     # Session timeout check (60 minutes of inactivity)
     if st.session_state['logged_in']:
