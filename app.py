@@ -403,6 +403,7 @@ else:  # Dashboard page
                 if password == PASSWORD:
                     st.session_state['logged_in'] = True
                     st.success('Login successful')
+                    st.rerun()  # Auto-redirect to dashboard
                 else:
                     st.error('Invalid credentials')
         st.stop()
