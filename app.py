@@ -566,7 +566,7 @@ else:  # Dashboard page
 
     with top_buttons_col1:
         # Enroll button styling - active if in enrollment mode
-        btn_style = "🆕 **Enroll New Patient**" if st.session_state['enrollment_mode'] else "🆕 Enroll New Patient"
+        btn_style = "🆕 Enroll New Patient" if st.session_state['enrollment_mode'] else "🆕 Enroll New Patient"
         btn_color = "#2ea043" if st.session_state['enrollment_mode'] else "#238636"  # Darker green if active
         if st.button(btn_style, use_container_width=True, key="enroll_btn"):
             if st.session_state['unsaved_changes'] and st.session_state['enrollment_mode']:
@@ -578,7 +578,7 @@ else:  # Dashboard page
 
     with top_buttons_col2:
         # View Patients button styling - active if not in enrollment mode
-        btn_style = "👥 **View Patients**" if not st.session_state['enrollment_mode'] else "👥 View Patients"
+        btn_style = "👥 View Patients" if not st.session_state['enrollment_mode'] else "👥 View Patients"
         btn_color = "#2563eb" if not st.session_state['enrollment_mode'] else "#1d4ed8"  # Darker blue if active
         if st.button(btn_style, use_container_width=True, key="view_btn"):
             if st.session_state['unsaved_changes'] and st.session_state['enrollment_mode']:
