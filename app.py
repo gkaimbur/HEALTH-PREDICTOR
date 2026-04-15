@@ -27,21 +27,32 @@ firebase_service_account_path = Path('firebase-service-account.json')
 db = None
 firebase_initialized = False
 
-# Try to load Firebase credentials from file or environment variable (for Vercel)
+# Try to load Firebase credentials from file or environment variable (for Vercel/Render)
 if firebase_admin and firestore:
     # Check if already initialized to prevent multiple initialization
     if not firebase_admin._apps:
         cred_source = None
         
-        if firebase_service_account_path.exists():
+        # Priority 1: Check Streamlit Cloud secrets (TOML format)
+        try:
+            if 'firebase' in st.secrets:
+                firebase_dict = dict(st.secrets['firebase'])
+                firebase_json = json.dumps(firebase_dict)
+                firebase_service_account_path.write_text(firebase_json)
+                cred_source = str(firebase_service_account_path)
+        except Exception as e:
+            pass
+        
+        # Priority 2: Check local file
+        if not cred_source and firebase_service_account_path.exists():
             cred_source = str(firebase_service_account_path)
-        else:
-            # Try to load from environment variable (Vercel deployment)
+        
+        # Priority 3: Check base64-encoded environment variable (Render/Railway)
+        if not cred_source:
             firebase_cred_base64 = os.getenv('FIREBASE_SERVICE_ACCOUNT_BASE64')
             if firebase_cred_base64:
                 try:
                     firebase_cred_json = base64.b64decode(firebase_cred_base64).decode('utf-8')
-                    # Write temporarily to load
                     firebase_service_account_path.write_text(firebase_cred_json)
                     cred_source = str(firebase_service_account_path)
                 except Exception as e:

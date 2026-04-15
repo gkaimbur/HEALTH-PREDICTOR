@@ -54,31 +54,96 @@ streamlit run app.py
 
 ## Deployment
 
-### Option 1: Deploy to Vercel (Docker)
-1. Update `.env` with Firebase credentials:
+### ✅ RECOMMENDED: Streamlit Cloud (Official)
+
+**Fastest & simplest deployment:**
+
+1. Go to [https://streamlit.io/cloud](https://streamlit.io/cloud) and sign in with GitHub
+2. Click **"New app"**
+3. Select:
+   - Repository: `GraceKaimburi/HEALTH`
+   - Branch: `main`
+   - Main file path: `app.py`
+4. Click **"Advanced settings"**
+5. Add your Firebase credentials to **"Secrets"** section:
+   ```toml
+   [firebase]
+   type = "service_account"
+   project_id = "your-project-id"
+   private_key_id = "..."
+   private_key = "..."
+   client_email = "..."
+   client_id = "..."
+   auth_uri = "https://accounts.google.com/o/oauth2/auth"
+   token_uri = "https://oauth2.googleapis.com/token"
+   ```
+6. Click **"Deploy"**
+
+**Get Firebase service account:**
+- Firebase Console → Project Settings → Service Accounts → Generate New Private Key
+- Copy the JSON content into secrets above
+
+**Pros:** Built for Streamlit, free tier, 1-click deployment, auto-updates on `git push`
+
+---
+
+### Alternative 1: Render.com (Free Tier)
+
+**Full control with native Docker support:**
+
+1. Go to [https://render.com](https://render.com) and connect GitHub
+2. Click **"New +"** → **"Web Service"**
+3. Select `GraceKaimburi/HEALTH` repository
+4. Configure:
+   - **Name**: `health-hdp-predictor`
+   - **Runtime**: `Python 3`
+   - **Build Command**: `pip install -r requirements.txt`
+   - **Start Command**: `streamlit run app.py --server.port=10000 --server.address=0.0.0.0`
+5. Add environment variable:
+   - **Key**: `FIREBASE_SERVICE_ACCOUNT_BASE64`
+   - **Value**: Your base64-encoded service account JSON
+   
+   *Encode your service account:*
    ```bash
-   FIREBASE_SERVICE_ACCOUNT_BASE64=<your-base64-encoded-service-account>
+   # On Windows PowerShell:
+   [Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes((Get-Content firebase-service-account.json -Raw)))
    ```
 
-2. Push to GitHub and connect to Vercel:
-   ```bash
-   git push origin main
-   ```
-   Vercel will automatically detect the Dockerfile and deploy
+6. Click **"Create Web Service"**
 
-3. Set environment variables in Vercel Project Settings
+**deployment auto-starts immediately on push**
 
-### Option 2: Deploy to Streamlit Cloud
-```bash
-streamlit run app.py
-# Then use "Deploy" button in Streamlit Cloud
-```
+**Pros:** Docker-native, persistent disk storage, free tier with $0.10/GB credit, auto-deploys on `git push`
 
-### Option 3: Deploy to Railway/Render
-1. Connect GitHub repository
-2. Set build command: `pip install -r requirements.txt`
-3. Set start command: `streamlit run app.py`
-4. Add Firebase environment variables
+---
+
+### Alternative 2: Railway.app
+
+1. Go to [https://railway.app](https://railway.app) and connect GitHub
+2. Click **"New Project"** → **"Deploy from GitHub repo"**
+3. Select `GraceKaimburi/HEALTH`
+4. Railway auto-detects `Dockerfile` and deploys
+5. Add environment variable in Dashboard:
+   - `FIREBASE_SERVICE_ACCOUNT_BASE64` = base64-encoded service account
+6. Deploy triggers automatically
+
+**Pros:** Excellent Docker support, $5/month free credit, GitHub auto-sync
+
+---
+
+### Comparison Table
+
+| Feature | Streamlit Cloud | Render | Railway |
+|---------|-----------------|--------|---------|
+| **Setup Time** | 2 minutes | 5 minutes | 5 minutes |
+| **Free Tier** | ✅ Yes | ✅ Yes | ✅ Yes ($5 credit) |
+| **Persistence** | ❌ Restarts | ✅ 1 GB disk | ✅ Ephemeral |
+| **Python Support** | ✅ Native | ✅ Native | ✅ Docker |
+| **Auto-Deploy** | ✅ On git push | ✅ On git push | ✅ On git push |
+| **Custom Domain** | ✅ Pro plan | ✅ Yes | ✅ Yes |
+| **Firebase Ready** | ✅ Built-in secrets | ✅ Env vars | ✅ Env vars |
+
+**Recommendation:** Start with **Streamlit Cloud** (official, simplest). Use **Render** if you need persistent storage beyond Streamlit's ephemeral filesystem.
 
 ## Configuration
 
